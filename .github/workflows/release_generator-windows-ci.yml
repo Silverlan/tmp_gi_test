@@ -71,7 +71,6 @@ jobs:
         uses: pyTooling/Actions/releaser/composite@main
         with:
           tag: nightly
-          rm: true
           token: ${{ secrets.GITHUB_TOKEN }}
           files: "test-win64.zip"
     
@@ -80,6 +79,5 @@ jobs:
         uses: pyTooling/Actions/releaser/composite@main
         with:
           tag: nightly
-          rm: true
           token: ${{ secrets.GITHUB_TOKEN }}
           files: "test-win64-2.zip"
