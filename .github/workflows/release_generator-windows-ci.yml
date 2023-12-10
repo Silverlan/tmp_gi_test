@@ -72,10 +72,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: "test-win64.zip"
     
-
       - name: Update nightly release 2
         uses: pyTooling/Actions/releaser/composite@main
         with:
           tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
           files: "test-win64-2.zip"
+
+      - name: Upload release
+        shell: bash
+        run:   |
+          ls -R
+          response=$(curl --write-out '%{http_code}' --silent --output /dev/null -v -F filename=test-win64.zip -F upload=@testFile.zip https://wiki.pragma-engine.com/test_git/test_upload_file.php?secret=${{ secrets.PRAGMA_UPLOAD_SECRET }})
+          response=$(curl --write-out '%{http_code}' --silent --output /dev/null -v -F filename=test-win64-2.zip -F upload=@testFile.zip https://wiki.pragma-engine.com/test_git/test_upload_file.php?secret=${{ secrets.PRAGMA_UPLOAD_SECRET }})
+          echo "Response: $response"
