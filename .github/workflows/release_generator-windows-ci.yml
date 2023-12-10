@@ -67,11 +67,19 @@ jobs:
           zip -r ./test-win64.zip "./addons"
           zip -r ./test-win64-2.zip "./addons"
 
-      - name: Update nightly release
+      - name: Update nightly release 1
         uses: pyTooling/Actions/releaser/composite@main
         with:
           tag: nightly
           rm: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: "test-win64.zip,test-win64-2.zip"
+          files: "test-win64.zip"
     
+
+      - name: Update nightly release 2
+        uses: pyTooling/Actions/releaser/composite@main
+        with:
+          tag: nightly
+          rm: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: "test-win64-2.zip"
