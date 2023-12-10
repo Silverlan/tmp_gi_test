@@ -1,0 +1,77 @@
+name: Release Generator Windows
+on:
+  push:
+    branches: [ main, master, actions ]
+  pull_request:
+    branches: [ main, master, actions ]
+
+concurrency:
+  group: environment-win-${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  build:
+    name: Build - ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: windows-latest
+            name: "Windows x64 MSVC"
+            artifact: "Windows-MSVC.tar.xz"
+            build_type: "RelWithDebInfo"
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            cc: "cl"
+            cxx: "cl"
+            archiver: "7z a"
+            generators: "Visual Studio 17 2022"
+            build_dir: 'build'
+    steps:
+      - uses: actions/checkout@v2
+          
+      - name: Install zip
+        shell: bash
+        run:   |
+          choco install zip
+          # sudo apt-get install zip
+
+      - name: Download Lua compiler
+        uses: robinraju/release-downloader@v1.3
+        with: 
+          repository: "Silverlan/lua_compile"
+          tag: "latest"
+          fileName: "binaries_windows64.zip"
+          out-file-path: "lua_compiler"
+
+      - name: Unzip Lua compiler
+        shell: bash
+        run:   |
+          cd lua_compiler
+          unzip binaries_windows64.zip -d .
+          
+      - name: Compile Lua files
+        shell: bash
+        run:   |
+          mkdir addons
+          cd addons
+          mkdir test
+          cd test
+          mkdir lua
+          cd lua
+          echo 'print("Hello")' > test.lua
+          
+      - name: Add test addon to archive
+        shell: bash
+        run:   |
+          zip -r ./test-win64.zip "./addons"
+
+      - name: Update nightly release
+        uses: pyTooling/Actions/releaser/composite@main
+        with:
+          tag: nightly
+          rm: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: "test-win64.zip"
+    
