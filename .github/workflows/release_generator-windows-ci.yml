@@ -62,27 +62,27 @@ jobs:
       - name: Add test addon to archive
         shell: bash
         run:   |
-          zip -r ./test-win64.zip "./addons"
-          zip -r ./test-win64-2.zip "./addons"
+          zip -r ./prelewd.zip "./addons"
+          zip -r ./prelewd-t3.zip "./addons"
 
       - name: Update nightly release 1
         uses: pyTooling/Actions/releaser/composite@main
         with:
           tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: "test-win64.zip"
+          files: "prelewd.zip"
     
       - name: Update nightly release 2
         uses: pyTooling/Actions/releaser/composite@main
         with:
           tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: "test-win64-2.zip"
+          files: "prelewd-t3.zip"
 
       - name: Upload release
         shell: bash
         run:   |
           ls -R
-          response=$(curl --write-out '%{http_code}' --silent --output /dev/null -v -F filename=testFile1.zip -F upload=@test-win64.zip https://prelewd.com/scripts/git_upload_prelewd_release.php?secret=${{ secrets.PRAGMA_UPLOAD_SECRET }})
-          response=$(curl --write-out '%{http_code}' --silent --output /dev/null -v -F filename=testFile2.zip -F upload=@test-win64-2.zip https://prelewd.com/scripts/git_upload_prelewd_release.php?secret=${{ secrets.PRAGMA_UPLOAD_SECRET }})
+          response=$(curl --write-out '%{http_code}' --silent --output /dev/null -v -F filename=testFile1.zip -F upload=@prelewd.zip https://prelewd.com/scripts/git_upload_prelewd_release.php?secret=${{ secrets.PRAGMA_UPLOAD_SECRET }})
+          response=$(curl --write-out '%{http_code}' --silent --output /dev/null -v -F filename=testFile2.zip -F upload=@prelewd-t3.zip https://prelewd.com/scripts/git_upload_prelewd_release.php?secret=${{ secrets.PRAGMA_UPLOAD_SECRET }})
           echo "Response: $response"
