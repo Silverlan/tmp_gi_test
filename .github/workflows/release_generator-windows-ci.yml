@@ -1,10 +1,12 @@
-name: Release Generator Windows
+name: Release Generator Linux
 on:
-  workflow_dispatch:
-    inputs:
+  push:
+    branches: [ main, master, actions ]
+  pull_request:
+    branches: [ main, master, actions ]
 
 concurrency:
-  group: environment-win-${{ github.ref }}
+  group: environment-lin-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -15,15 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - os: windows-latest
-            name: "Windows x64 MSVC"
-            artifact: "Windows-MSVC.tar.xz"
+          - os: ubuntu-22.04
+            name: "Ubuntu GCC-11"
+            artifact: "ubuntu_gcc.7z"
             build_type: "RelWithDebInfo"
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-            cc: "cl"
-            cxx: "cl"
+            cc: "clang-14"
+            cxx: "clang++-14"
             archiver: "7z a"
-            generators: "Visual Studio 17 2022"
+            generators: "Unix Makefiles"
             build_dir: 'build'
     steps:
       - uses: actions/checkout@v2
@@ -31,22 +32,22 @@ jobs:
       - name: Install zip
         shell: bash
         run:   |
-          choco install zip
-          # sudo apt-get install zip
+          sudo apt-get install zip
 
       - name: Download Lua compiler
         uses: robinraju/release-downloader@v1.3
         with: 
           repository: "Silverlan/lua_compile"
           tag: "latest"
-          fileName: "binaries_windows64.zip"
+          fileName: "binaries_linux64.tar.gz"
           out-file-path: "lua_compiler"
 
       - name: Unzip Lua compiler
         shell: bash
         run:   |
+          mkdir -p lua_compiler   # Create a directory if it doesn't exist
           cd lua_compiler
-          unzip binaries_windows64.zip -d .
+          tar -xzf binaries_linux64.tar.gz -C .
           
       - name: Compile Lua files
         shell: bash
