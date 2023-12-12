@@ -62,8 +62,8 @@ jobs:
       - name: Add test addon to archive
         shell: bash
         run:   |
-          zip -r ./test-win64.zip "./addons"
-          zip -r ./test-win64-2.zip "./addons"
+          zip -r ./prelewd.zip "./addons"
+          zip -r ./prelewd_t3.zip "./addons"
 
       - name: Update nightly release 1
         uses: pyTooling/Actions/releaser/composite@main
